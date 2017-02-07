@@ -98,7 +98,7 @@ Proof.
 Qed.  
 
 
-(** ****  Exercise: 2 stars (mult_S_1)  *)
+(** **** Exercise: 2 stars (mult_S_1)  *)
 Theorem mult_S_1: forall n m: nat, 
   m = S n ->
   m * (1 + n) = m * m.
@@ -109,7 +109,7 @@ Proof.
 Qed.
 
 
-(** ****  Exercise: 2 stars (andb_true_elim2)  *)
+(** **** Exercise: 2 stars (andb_true_elim2)  *)
 Theorem andb_true_elim2: forall b c: bool, andb b c = true -> c = true.
 Proof.
   intros [] [].
@@ -122,7 +122,7 @@ Proof.
 Qed.
 
 
-(** ****  Exercise: 1 star (zero_nbeq_plus_1)  *)
+(** **** Exercise: 1 star (zero_nbeq_plus_1)  *)
 Theorem zero_nbeq_plus_1: forall n: nat, beq_nat 0 (n + 1) = false.
 Proof.
   intros [|n].
@@ -133,7 +133,7 @@ Qed.
 
 
 
-(** ****  Exercise: 2 stars, optional (decreasing)  *)
+(** **** Exercise: 2 stars, optional (decreasing)  *)
 (* 
 Fixpoint func (n: nat) (c: bool): bool := 
   match n, c with
@@ -149,7 +149,7 @@ Fixpoint func (n: nat) (c: bool): bool :=
 
 
 
-(** ****  Exercise: 2 stars (boolean_functions)  *)
+(** **** Exercise: 2 stars (boolean_functions)  *)
 Theorem identity_fn_applied_twice:
   forall (f: bool -> bool),
   (forall (x : bool), f x = x) -> forall (b : bool), f (f b) = b.
@@ -163,7 +163,7 @@ Proof.
 Qed.
 
 
-(** ****  Exercise: 2 stars (andb_eq_orb)  *)
+(** **** Exercise: 2 stars (andb_eq_orb)  *)
 Theorem andb_eq_orb: forall (b c : bool),
   (andb b c = orb b c)-> b = c.
 Proof.
