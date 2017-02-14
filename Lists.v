@@ -1,6 +1,7 @@
 Require Import Coq.Init.Nat.
 Require Import Coq.Arith.EqNat.
  
+ 
 Module NatList.
 
 Inductive natprod: Type :=
@@ -32,6 +33,40 @@ Notation "[ ]" := nil.
 Notation "[ x ; .. ; y ]" := (cons x .. (cons y nil) ..).
 
 
+Fixpoint app (l1 l2: natlist): natlist :=
+  match l1 with
+  | nil    => l2
+  | h :: t => h :: (app t l2)
+  end.
+
+Notation "x ++ y" := (app x y)(right associativity, at level 60).
+
+
+Theorem app_assoc: forall l1 l2 l3: natlist,
+  (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).
+Proof.
+  intros l1 l2 l3. 
+  induction l1 as [| n l1' IHl1'].
+  - reflexivity.
+  - simpl. 
+    rewrite -> IHl1'. 
+    reflexivity.  
+Qed.
+
+
+Fixpoint rev (l: natlist): natlist :=
+  match l with
+  | nil => nil
+  | h :: t => rev t ++ [h]
+  end.
+  
+  
+
+  
+
+
+  
+
 
 
 (** **** Exercise: 1 star (snd_fst_is_swap)  *)
@@ -51,19 +86,6 @@ Proof.
 Qed.
 
 
-Fixpoint app (l1 l2: natlist): natlist :=
-  match l1 with
-  | nil    => l2
-  | h :: t => h :: (app t l2)
-  end.
-
-Notation "x ++ y" := (app x y)(right associativity, at level 60).
-
-Fixpoint rev (l: natlist): natlist :=
-  match l with
-  | nil => nil
-  | h :: t => rev t ++ [h]
-  end.
 
 
 (** **** Exercise: 2 stars, recommended (list_funs)  *)
@@ -258,12 +280,29 @@ Proof.
 Qed. 
 
 
+(* for prove rev_involutive *)
+Theorem rev_swap: forall l1 l2: natlist, rev (l1 ++ l2) = rev l2 ++ rev l1.
+Proof.
+  intros l1 l2.
+  induction l1.
+  - simpl.
+    symmetry.
+    apply app_nil_r.
+  - simpl.
+    rewrite IHl1.
+    apply app_assoc.
+Qed.   
+
+
 Theorem rev_involutive: forall l: natlist, rev (rev l) = l.
 Proof.
   induction l as [|l L H].
   - reflexivity.
   - simpl.
-Abort.
+    rewrite rev_swap.
+    rewrite H.
+    reflexivity.
+Qed.
 
 
 (** **** Exercise: 2 stars (beq_natlist)  *)

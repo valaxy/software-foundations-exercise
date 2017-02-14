@@ -1,3 +1,5 @@
+Require Import Coq.Init.Nat.
+
 Theorem plus_n_O: forall n: nat, n = n + 0.
 Proof.
   induction n as [| n' IHn'].
@@ -7,7 +9,6 @@ Qed.
 
 
 (** ****  Exercise: 2 stars, recommended (basic_induction)  *)
-
 Theorem mult_0_r: forall n: nat, n * 0 = 0.
 Proof.
   induction n as [|n' H].
@@ -81,7 +82,7 @@ Proof.
 Qed.
 
 
-Require Import Coq.Init.Nat.
+
 
 
 (** **** Exercise: 2 stars, optional (evenb_S)  *)
@@ -116,17 +117,141 @@ Proof.
 Qed.
 
 
+Lemma mult_distr: forall n m: nat, (n * m) + n = n * (S m).
+Proof.
+  intros n m.
+  induction n as [|n H].
+  - reflexivity.
+  - simpl. 
+    rewrite <- H.
+    rewrite -> plus_n_Sm.
+    rewrite -> plus_n_Sm.
+    rewrite -> plus_assoc.
+    reflexivity.
+Qed.
+
+
+Lemma mult_distr2: forall n m: nat, (n * m) + m = (S n) * m.
+Proof.
+  intros n m. 
+  induction n as [|n H].
+  - simpl.
+    apply plus_n_O.
+  - simpl.
+    rewrite -> plus_assoc.
+    assert (P: n*m + m = m + n*m). {
+      rewrite -> plus_comm.
+      reflexivity.
+    }
+    rewrite <- P.
+    rewrite <- plus_comm with (n := n*m) (m := m + m).
+    rewrite -> plus_assoc.
+    reflexivity. 
+Qed.
+    
+   
 Theorem mult_comm: forall m n: nat, m * n = n * m.
 Proof.
   intros m n.
-  induction m as [|m' H].
-  - rewrite mult_0_r.
-    reflexivity.
+  induction n as [|n H].
+  (* n = 0 *)
   - simpl.
-    rewrite H.
-    induction n as [|n' P].
-    + reflexivity.
-    + simpl.
+    rewrite -> mult_0_r.
+    reflexivity.
+  (* n = S n' *)
+  - rewrite <- mult_distr.
+    rewrite -> H.
+    rewrite -> mult_distr2.
+    reflexivity. 
+Qed.
+
+
+
+Theorem leb_refl: forall n: nat, true = leb n n.
+Proof.
+  intros n.
+  induction n as [|n H].
+  - reflexivity.
+  - simpl.
+    apply H.
+Qed.
+
+
+
+Theorem zero_nbeq_S: forall n: nat, eqb 0 (S n) = false.
+Proof.
+  intros n.
+  reflexivity.
+Qed.
+  
+  
+Theorem andb_false_r: forall b: bool, andb b false = false.
+Proof.
+  intros b.
+  destruct b.
+  - reflexivity.
+  - reflexivity.
+Qed.
+  
+
+
+Theorem plus_ble_compat_l: forall n m p: nat,
+  leb n m = true -> leb (p + n) (p + m) = true.
+Proof.
+  intros n m p H.
+  induction p as [|p P].
+  - simpl.
+    apply H.
+  - simpl.
+    apply P.
+Qed.    
+  
+    
+Theorem S_nbeq_0: forall n: nat, eqb (S n) 0 = false.
+Proof.
+  intros n.
+  reflexivity.
+Qed.
+
+
+
+Theorem mult_1_l: forall n: nat, 1 * n = n.
+Proof.
+  intros n.
+  simpl.
+  symmetry.
+  apply plus_n_O.
+Qed.
+
+
+  
+Theorem all3_spec: forall b c: bool,
+    orb
+      (andb b c)
+      (orb (negb b)
+               (negb c))
+  = true.
+Proof.
+  intros b c.
+  destruct b.
+  destruct c.
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+Qed.
+
+
+
+Theorem mult_plus_distr_r: forall n m p: nat,
+  (n + m) * p = (n * p) + (m * p).
+Proof.
+Abort.
+
+
+
+Theorem mult_assoc: forall n m p: nat,
+  n * (m * p) = (n * m) * p.
+Proof.
 Abort.
 
 

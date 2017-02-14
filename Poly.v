@@ -32,10 +32,26 @@ Check c.
 
 End MumbleGrumble.
 
+
+
+
+
+
+
 Require Import Coq.Lists.List.
 
-Notation "x ++ y" := (app x y). (* Why I should introduce '++' explicitly *)
+Fixpoint fold {X Y:Type}(f: X->Y->Y)(l: list X)(b: Y): Y :=
+  match l with
+  | nil => b
+  | h :: t => f h (fold f t b)
+  end.
 
+Definition fold_length {X: Type} (l: list X): nat :=
+  fold (fun _ n => S n) l 0.
+
+
+
+  
 
 (** **** Exercise: 2 stars, optional (poly_exercises)  *)
 
@@ -92,6 +108,32 @@ Proof.
 Abort.
 
 
+
+
+
+
+(** **** Exercise: 1 star, advanced (fold_types_different) *)
+(* sum with nat to Z *)
+
+
+(** **** Exercise: 2 stars (fold_length)  *)
+Theorem fold_length_correct : forall X (l: list X), fold_length l = length l.
+Proof.
+  intros X l.
+  induction l.
+  - reflexivity.
+  - simpl.
+    assert (P: forall X (a: X)(l: list X), fold_length (a :: l) = fold_length (a :: nil) + fold_length l). {
+      intros Y a' l'.
+      unfold fold_length.
+      simpl.
+      reflexivity.
+    }
+    rewrite P.
+    simpl.
+    rewrite IHl.
+    reflexivity.
+Qed.    
 
 
 
