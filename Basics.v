@@ -1,3 +1,4 @@
+(** finish reading, finish exercise **)
 Fixpoint beq_nat (n m : nat) : bool :=
   match n with
   | O => 
