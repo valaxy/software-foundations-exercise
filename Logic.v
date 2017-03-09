@@ -1,20 +1,28 @@
 Require Import Coq.Setoids.Setoid.
 
+
 (** **** Exercise: 2 stars (and_exercise)  *)
 Example and_exercise: forall n m: nat, n + m = 0 -> n = 0 /\ m = 0.
 Proof.
   intros n m P.
   split.
-Abort.
+  - destruct n.
+    + reflexivity.
+    + inversion P.
+  - destruct n.
+    + simpl in P. 
+      rewrite P.
+      reflexivity.
+    + inversion P.
+Qed.
 
 
 
 (** **** Exercise: 1 star, optional (proj2)  *)
 Lemma proj2: forall P Q: Prop, P /\ Q -> Q.
 Proof.
-  intros P Q H.
-  destruct H.
-  apply H0.
+  intros P Q [H1 H2].
+  apply H2.
 Qed.
 
 
@@ -38,8 +46,12 @@ Qed.
 (** **** Exercise: 1 star (mult_eq_0)  *)
 Lemma mult_eq_0: forall n m, n * m = 0 -> n = 0 \/ m = 0.
 Proof.
-  intros n m P.
-Abort.  
+  intros [|n] [|m] P.
+  - left. reflexivity.
+  - left. reflexivity.
+  - right. reflexivity.
+  - inversion P.
+Qed.
 
 
 
@@ -77,10 +89,12 @@ Qed.
 (** **** Exercise: 2 stars, recommended (contrapositive)  *)
 Theorem contrapositive: forall P Q: Prop, (P -> Q) -> (~Q -> ~P).
 Proof.
-  intros P Q H G.
-  unfold not in G.
-Abort.
-  
+  unfold not.
+  intros P Q H1 H2 H3.
+  apply H1 in H3.
+  apply H2 in H3.
+  apply H3.
+Qed.
 
 
 

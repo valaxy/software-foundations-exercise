@@ -1,4 +1,4 @@
-Require Import Coq.Init.Nat.
+Require Import Nat Bool Peano.
 
 Theorem plus_n_O: forall n: nat, n = n + 0.
 Proof.
@@ -91,8 +91,12 @@ Proof.
   intros n.
   induction n as [|n H].
   - reflexivity.
-  - simpl.
-Abort.
+  - rewrite H.
+    rewrite negb_involutive.
+    reflexivity.
+Qed.    
+    
+      
 
 
 (** **** Exercise: 1 star (destruct_induction)  *)
@@ -245,7 +249,33 @@ Qed.
 Theorem mult_plus_distr_r: forall n m p: nat,
   (n + m) * p = (n * p) + (m * p).
 Proof.
+  intros n m p.
+  induction p.
+  - rewrite !mult_0_r.
+    reflexivity.
+  - rewrite <- !mult_n_Sm.
+    rewrite IHp.
+    assert (P: n + (m * p + m) = m * p + (n + m)). { 
+      apply plus_swap.
+    }
+Abort. (*
+    assert (Q: forall x y z: nat, x + y + z = x + (y + z)). {
+      intros x y z.
+      induction x.
+      + reflexivity.
+      + simpl.
+        rewrite IHx.
+        reflexivity.
+    }
+    assert (R: n * p + n + (m * p + m) = n * p + m * p + m + n). {
+      rewrite Q.
+      
+      reflexivity.
+    } 
+    rewrite Q.    
 Abort.
+    (*rewrite plus_swap.*)
+*)    
 
 
 
