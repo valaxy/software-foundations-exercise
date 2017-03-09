@@ -1,5 +1,5 @@
-Require Import Coq.Setoids.Setoid.
-
+Require Import Coq.Setoids.Setoid List.
+Import ListNotations.
 
 (** **** Exercise: 2 stars (and_exercise)  *)
 Example and_exercise: forall n m: nat, n + m = 0 -> n = 0 /\ m = 0.
@@ -196,10 +196,102 @@ Proof.
 Qed.
 
 
+Fixpoint In {A: Type}(x: A)(l: list A): Prop :=
+  match l with
+  | [] => False
+  | x' :: l' => x' = x \/ In x l'
+  end.
+
+
+
+(** **** Exercise: 2 stars (In_map_iff)  *)
+Lemma In_map_iff:
+  forall (A B: Type)(f: A -> B)(l: list A)(y: B),
+    In y (map f l) <->
+    exists x, f x = y /\ In x l.
+Proof.
+  intros A B f l y.
+  split.
+  - intros H.
+    induction l as [|a l R].
+    + simpl in H.
+      destruct H.
+    + simpl.
+      simpl in H.
+      destruct H as [H|H].
+      * exists a.
+        split.
+        apply H.
+        left. reflexivity.
+      * apply R in H.
+        destruct H as [x0 H].
+        exists x0.
+        destruct H as [H0 H1].
+        split.
+        apply H0.
+        right.
+        apply H1.
+  - intros [x [H P]].
+    induction l as [|a l R].
+    + destruct P.
+    + simpl.
+      simpl in P.
+      destruct P as [P|P].
+      * left.
+        subst.
+        reflexivity.
+      * right.
+        apply R in P.
+        apply P.
+Qed.
+
+
+
+(** **** Exercise: 2 stars (in_app_iff)  *)
+Lemma in_app_iff: forall A l l' (a: A),
+  In a (l++l') <-> In a l \/ In a l'.
+Proof.
+  intros A l l' a.
+  split.
+  - induction l as [|x l H].
+    + simpl.
+      intros P.
+      right.
+      apply P.
+    + simpl.
+      intros P.
+      destruct P as [P|P].
+      * left.
+        left.
+        apply P.
+      * apply H in P.
+        destruct P as [P|P].
+        left.
+        right.
+        apply P.
+        right.
+        apply P.
+  - intros [H|H].
+    + induction l as [|x l P].
+      * destruct H.
+      * simpl.
+        simpl in H.
+        destruct H as [H|H].
+        left. apply H.
+        right. apply P in H. apply H.
+    + induction l as [|x l P].
+      * simpl.
+        apply H.
+      * simpl.
+        right.
+        apply P.
+Qed.
+
+
 (* exercises *)
 
 
-       
+
 
 
 
