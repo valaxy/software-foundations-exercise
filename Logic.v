@@ -1,4 +1,4 @@
-Require Import Coq.Setoids.Setoid List.
+Require Import Coq.Setoids.Setoid List Nat.
 Import ListNotations.
 
 (** **** Exercise: 2 stars (and_exercise)  *)
@@ -285,6 +285,107 @@ Proof.
       * simpl.
         right.
         apply P.
+Qed.
+
+
+
+(** **** Exercise: 3 stars (All)  *)
+
+Fixpoint All {T: Type}(P: T -> Prop)(l: list T): Prop :=
+  match l with
+  | nil => True
+  | h :: t => P h /\ All P t
+  end.
+  
+Lemma All_In:
+  forall T (P: T -> Prop)(l: list T), (forall x, In x l -> P x) <-> All P l.
+Proof.
+  intros T P l.
+  split.
+  - intros H.
+    induction l as [|t l Q].
+    + simpl.
+      apply I.
+    + simpl.
+      simpl in H.
+      split.
+      * apply H.
+        left.
+        reflexivity.
+      * apply Q.
+        intros y R.
+        apply H.
+        right.
+        apply R.
+  - intros H x R.
+    induction l as [|t l Q].
+    + simpl in R.
+      destruct R.
+    + simpl in H.
+      simpl in R.
+      destruct R.
+      * subst.
+        destruct H as [H0 H1].
+        apply H0.
+      * apply Q.
+        destruct H.
+        apply H1.
+        apply H0.
+Qed.
+
+
+(** **** Exercise: 3 stars (combine_odd_even)  *)
+Definition combine_odd_even_imp (Podd Peven: nat -> Prop)(n: nat): Prop :=
+  if odd n then Podd n else Peven n.
+  
+Definition combine_odd_even (Podd Peven: nat -> Prop): nat -> Prop :=
+  combine_odd_even_imp Podd Peven.
+
+(** To test your definition, prove the following facts: *)
+
+Theorem combine_odd_even_intro:
+  forall (Podd Peven: nat -> Prop)(n: nat),
+    (odd n = true -> Podd n) ->
+    (odd n = false -> Peven n) ->
+    combine_odd_even Podd Peven n.
+Proof.
+  intros Podd Peven n H P.
+  unfold combine_odd_even.
+  unfold combine_odd_even_imp.
+  destruct (odd n).
+  - apply H.
+    reflexivity.
+  - apply P.
+    reflexivity.
+Qed.
+
+Theorem combine_odd_even_elim_odd:
+  forall (Podd Peven: nat -> Prop)(n: nat),
+    combine_odd_even Podd Peven n ->
+    odd n = true ->
+    Podd n.
+Proof.
+  intros Podd Peven n H P.
+  unfold combine_odd_even in H.
+  unfold combine_odd_even_imp in H.
+  destruct (odd n).
+  - apply H.
+  - inversion P.
+Qed.
+
+
+Theorem combine_odd_even_elim_even:
+  forall (Podd Peven: nat -> Prop)(n: nat),
+    combine_odd_even Podd Peven n ->
+    odd n = false ->
+    Peven n.
+Proof.
+  intros Podd Peven n P Q.
+  unfold combine_odd_even in P.
+  unfold combine_odd_even_imp in P.
+  destruct (odd n).
+  - inversion Q.
+  - apply P.
 Qed.
 
 
