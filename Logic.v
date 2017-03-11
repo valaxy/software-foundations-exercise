@@ -389,7 +389,96 @@ Proof.
 Qed.
 
 
-(* exercises *)
+
+
+(** **** Exercise: 4 stars (tr_rev)  *)
+Axiom functional_extensionality: forall {X Y: Type}{f g: X -> Y},
+  (forall (x: X), f x = g x) -> f = g.
+
+Fixpoint rev_append {X}(l1 l2: list X): list X :=
+  match l1 with
+  | [] => l2
+  | x :: l1' => rev_append l1' (x :: l2)
+  end.
+
+Definition tr_rev {X}(l: list X): list X := rev_append l [].
+
+Lemma xyz: forall (X: Type)(l1 l2: list X), rev_append l1 l2 = rev_append l1 [] ++ l2.
+Proof.
+  intros X l1 l2.
+  induction l1 as [|x l H].
+  - reflexivity.
+  - simpl.
+    induction l2 as [|y l2 H2].
+    + rewrite app_nil_r.
+      reflexivity.
+    + simpl.
+Admitted.    
+
+Lemma tr_rev_correct: forall X, @tr_rev X = @rev X.
+Proof.
+  intros X.
+  apply functional_extensionality.
+  intros l.
+  induction l as [|x l H].
+  - reflexivity.
+  - simpl.
+    rewrite <- H.
+    unfold tr_rev.
+    simpl.
+    clear H.
+    generalize dependent x.
+    induction l as [|y l P].
+    + reflexivity.
+    + simpl.
+      intros x.
+      rewrite P.
+      simpl.
+Admitted.
+
+
+(** **** Exercise: 3 stars (evenb_double_conv)  *)
+Theorem evenb_S: forall n: nat, even (S n) = negb (even n).
+Proof. Admitted.
+
+Theorem double_negb: forall b: bool, negb (negb b) = b.
+Proof. Admitted.
+
+Theorem evenb_double_conv: forall n,
+  exists k, n = if even n then double k
+                else S (double k).
+Proof.
+  intros n.
+  induction n as [|n [k0 H]].
+  - simpl.
+    exists 0.
+    reflexivity.
+  - simpl.
+    destruct (even n) eqn:P.
+    + exists k0.
+      rewrite <- H.
+      simpl.
+      destruct n.
+      * reflexivity.
+      * rewrite evenb_S in P.
+        destruct (even n).
+        simpl in P.
+        inversion P.
+        reflexivity.
+    + exists (k0+1).
+      unfold double.
+      unfold double in H.
+      destruct n.
+      * inversion H.
+      * rewrite evenb_S in P.
+        destruct (even n).
+        rewrite H.
+Admitted. (* use omega? *)
+
+
+
+
+
 
 
 
