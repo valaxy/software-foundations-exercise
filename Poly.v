@@ -1,6 +1,7 @@
-(** finish reading, not finish exercise **)
+(** finish reading, finish exercise **)
 Require Import List Bool Nat.
 Import ListNotations.
+
 Local Open Scope list_scope.
 
 (** **** Exercise: 2 stars (mumble_grumble)  *)
@@ -53,7 +54,7 @@ Definition fold_length {X: Type} (l: list X): nat :=
 
 
 
-  
+
 
 (** **** Exercise: 2 stars, optional (poly_exercises)  *)
 
@@ -102,8 +103,8 @@ Proof.
   - simpl.
     rewrite IHl1.
     rewrite app_assoc.
-    reflexivity.   
-Qed. 
+    reflexivity.
+Qed.
 
 
 Theorem rev_involutive: forall X: Type, forall l: list X,
@@ -115,8 +116,8 @@ Proof.
     rewrite rev_app_distr.
     rewrite IHl.
     reflexivity.
-Qed.    
-  
+Qed.
+
 
 
 
@@ -130,12 +131,13 @@ Fixpoint split {X Y: Type}(l: list (X*Y)): (list X) * (list Y) :=
   | nil => (nil, nil)
   | (x,y) :: t => let (l,r) := split t in (x :: l, y :: r)
   end.
-  
+
+
 Example test_split: split [(1,false);(2,false)] = ([1;2],[false;false]).
 Proof. reflexivity. Qed.
 
 
- 
+
 (** **** Exercise: 1 star, optional (hd_error_poly)  *)
 Definition hd_error {X: Type}(l: list X): option X :=
   match l with
@@ -201,7 +203,7 @@ Fixpoint flat_map {X Y: Type}(f: X -> list Y)(l: list X): (list Y) :=
 Example test_flat_map1: flat_map (fun n => [n;n;n]) [1;5;4] = [1; 1; 1; 5; 5; 5; 4; 4; 4].
 Proof. reflexivity.  Qed.
 
-   
+
 
 (** **** Exercise: 2 stars, optional (implicit_args)  *)
 (* not do it *)
