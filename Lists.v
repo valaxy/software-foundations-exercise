@@ -1,7 +1,14 @@
-Require Import Coq.Init.Nat.
+(**************************************
+  Finish reading, Finish exercise
+**************************************)
+
+Require Import Nat.
 Require Import Coq.Arith.EqNat.
- 
- 
+
+
+(* ================================================================= *)
+(** * Pairs of Numbers *)
+
 Module NatList.
 
 Inductive natprod: Type :=
@@ -23,6 +30,31 @@ Definition swap_pair (p: natprod): natprod :=
   match p with
   | (x, y) => (y, x)
   end.
+
+
+(** **** Exercise: 1 star (snd_fst_is_swap)  *)
+Theorem snd_fst_is_swap: forall (p: natprod), (snd p, fst p) = swap_pair p.
+Proof.
+  intros [].
+  reflexivity.
+Qed.
+
+
+
+(** **** Exercise: 1 star, optional (fst_swap_is_snd)  *)
+Theorem fst_swap_is_snd: forall (p: natprod), fst (swap_pair p) = snd p.
+Proof.
+  intros [].
+  reflexivity.
+Qed.
+
+
+
+
+
+
+(* ================================================================= *)
+(** * Lists of Numbers *)
 
 Inductive natlist: Type :=
   | nil : natlist
@@ -59,31 +91,9 @@ Fixpoint rev (l: natlist): natlist :=
   | nil => nil
   | h :: t => rev t ++ [h]
   end.
-  
-  
 
-  
+Definition bag := natlist.
 
-
-  
-
-
-
-(** **** Exercise: 1 star (snd_fst_is_swap)  *)
-Theorem snd_fst_is_swap: forall (p: natprod), (snd p, fst p) = swap_pair p.
-Proof.
-  intros [].
-  reflexivity.
-Qed.
-
-
-
-(** **** Exercise: 1 star, optional (fst_swap_is_snd)  *)
-Theorem fst_swap_is_snd: forall (p: natprod), fst (swap_pair p) = snd p.
-Proof.
-  intros [].
-  reflexivity.
-Qed.
 
 
 
@@ -103,18 +113,18 @@ Example test_nonzeros: nonzeros [0;1;0;2;3;0;0] = [1;2;3].
 Proof. reflexivity. Qed.
 
 
-Fixpoint oddmembers (l: natlist): natlist := 
+Fixpoint oddmembers (l: natlist): natlist :=
   match l with
   | nil => nil
   | h :: t =>
     match odd(h) with
     | false => oddmembers t
     | true => h :: oddmembers t
-    end  
+    end
   end.
 
 Example test_oddmembers: oddmembers [0;1;0;2;3;0;0] = [1;3].
-Proof. reflexivity. Qed.  
+Proof. reflexivity. Qed.
 
 
 Fixpoint countoddmembers (l:natlist): nat :=
@@ -156,10 +166,10 @@ Example test_alternate3: alternate [1;2;3] [4] = [1;4;2;3].
 Proof. reflexivity. Qed.
 
 Example test_alternate4: alternate [] [20;30] = [20;30].
-Proof. reflexivity. Qed. 
+Proof. reflexivity. Qed.
 
 
-Definition bag := natlist.
+
 
 (** **** Exercise: 3 stars, recommended (bag_functions)  *)
 Fixpoint count (v: nat)(s: bag): nat :=
@@ -167,7 +177,7 @@ Fixpoint count (v: nat)(s: bag): nat :=
   | nil => 0
   | h :: t => 
     match eqb v h with
-    | true => 1 + count v t
+    | true  => 1 + count v t
     | false => count v t
     end
   end.
@@ -263,10 +273,23 @@ Proof. reflexivity. Qed.
 
 (** **** Exercise: 3 stars, recommended (bag_theorem)  *)
 (* not do the exercese *)
+Theorem bag_theorem: forall (s: bag) (n: nat), count n (add n s) = 1 + count n s.
+Proof.
+  intros s n.
+  simpl.
+  rewrite <- beq_nat_refl.
+  reflexivity.
+Qed.
+
+
+
+
+
 
 
 
 (* ================================================================= *)
+(** * Reasoning About Lists *)
 (** ** List Exercises, Part 1 *)
 
 (** **** Exercise: 3 stars (list_exercises)  *)
@@ -277,21 +300,24 @@ Proof.
   - simpl.
     rewrite H.
     reflexivity.
-Qed. 
+Qed.
 
 
-(* for prove rev_involutive *)
-Theorem rev_swap: forall l1 l2: natlist, rev (l1 ++ l2) = rev l2 ++ rev l1.
+
+Theorem rev_app_distr: forall l1 l2 : natlist,
+  rev (l1 ++ l2) = rev l2 ++ rev l1.
 Proof.
   intros l1 l2.
-  induction l1.
+  induction l1 as [|l L H].
   - simpl.
-    symmetry.
-    apply app_nil_r.
+    rewrite app_nil_r.
+    reflexivity.
   - simpl.
-    rewrite IHl1.
-    apply app_assoc.
-Qed.   
+    rewrite H.
+    rewrite app_assoc.
+    reflexivity.
+Qed.
+
 
 
 Theorem rev_involutive: forall l: natlist, rev (rev l) = l.
@@ -299,17 +325,45 @@ Proof.
   induction l as [|l L H].
   - reflexivity.
   - simpl.
-    rewrite rev_swap.
+    rewrite rev_app_distr.
     rewrite H.
     reflexivity.
 Qed.
+
+
+
+Theorem app_assoc4 : forall l1 l2 l3 l4 : natlist,
+  l1 ++ (l2 ++ (l3 ++ l4)) = ((l1 ++ l2) ++ l3) ++ l4.
+Proof.
+  intros.
+  rewrite app_assoc.
+  rewrite app_assoc.
+  reflexivity.
+Qed.
+
+
+Lemma nonzeros_app : forall l1 l2 : natlist,
+  nonzeros (l1 ++ l2) = (nonzeros l1) ++ (nonzeros l2).
+Proof.
+  intros l1 l2.
+  induction l1 as [|l L H].
+  - simpl.
+    reflexivity.
+  - simpl.
+    destruct l.
+    + rewrite H.
+      reflexivity.
+    + simpl.
+      rewrite H.
+      reflexivity.
+Qed.
+
 
 
 (** **** Exercise: 2 stars (beq_natlist)  *)
 Fixpoint beq_natlist (l1 l2: natlist): bool :=
   match l1, l2 with
   | nil, nil => true
-  | nil, _ => false
   | h1 :: t1, h2 :: t2 => 
     if eqb h1 h2 then beq_natlist t1 t2 else false
   | _, _ => false
@@ -325,7 +379,7 @@ Example test_beq_natlist3: beq_natlist [1;2;3] [1;2;4] = false.
 Proof. reflexivity. Qed.
 
 Theorem beq_natlist_refl: forall l: natlist, true = beq_natlist l l.
-Proof. 
+Proof.
   intros l.
   induction l.
   - reflexivity.
@@ -335,7 +389,8 @@ Proof.
 Qed.
 
 
-(* ================================================================= *)
+
+
 (** ** List Exercises, Part 2 *)
 
 (** **** Exercise: 3 stars, advanced (bag_proofs)  *) 
@@ -361,18 +416,57 @@ Proof.
     simpl.  rewrite IHn'.  reflexivity.  
 Qed.
 
-Theorem remove_decreases_count: forall (s: bag),
+(** **** Exercise: 3 stars, advanced (remove_decreases_count)  *)
+Theorem remove_decreases_count: forall (s : bag),
   leb (count 0 (remove_one 0 s)) (count 0 s) = true.
 Proof.
   intros s.
-Abort.
+  induction s as [|n s H].
+  - reflexivity.
+  - simpl.
+    destruct n.
+    + simpl.
+      rewrite ble_n_Sn.
+      reflexivity.
+    + simpl.
+      rewrite H.
+      reflexivity.
+Qed.
+
 
 (** **** Exercise: 3 stars, optional (bag_count_sum)  *)
-(* not do it *)
+Theorem bag_count_sum: forall (n: nat) (s1 s2: bag),
+  count n (sum s1 s2) = (count n s1) + (count n s2).
+Proof.
+  intros n s1 s2.
+  induction s1 as [|n' s H].
+  - simpl.
+    reflexivity.
+  - simpl.
+    destruct (n =? n').
+    + rewrite H.
+      reflexivity.
+    + rewrite H.
+      reflexivity.
+Qed.
 
 
 (** **** Exercise: 4 stars, advanced (rev_injective)  *)
-(* dont know how to do *)
+Theorem rev_injective: forall (l1 l2 : natlist), rev l1 = rev l2 -> l1 = l2.
+Proof.
+  intros l1 l2 H.
+  rewrite <- rev_involutive.
+  rewrite <- H.
+  rewrite -> rev_involutive.
+  reflexivity.
+Qed.
+
+
+
+
+
+(* ================================================================= *)
+(** * Options *)
 
 Definition hd (default: nat)(l: natlist): nat :=
   match l with
@@ -392,7 +486,7 @@ Definition option_elim (d: nat)(o: natoption): nat :=
 
 
 (** **** Exercise: 2 stars (hd_error)  *)
- 
+
 Definition hd_error (l: natlist): natoption :=
   match l with
   | nil => None
@@ -407,7 +501,7 @@ Proof. reflexivity. Qed.
 
 Example test_hd_error3: hd_error [5;6] = Some 5.
 Proof. reflexivity. Qed.
- 
+
 
 (** **** Exercise: 1 star, optional (option_elim_hd)  *)
 Theorem option_elim_hd: forall (l: natlist)(default: nat),
@@ -428,6 +522,7 @@ End NatList.
 
 
 
+(* ================================================================= *)
 (** * Partial Maps *)
 
 Inductive id: Type :=
@@ -451,7 +546,7 @@ Qed.
 
 Module PartialMap.
 Import NatList.
-  
+
 Inductive partial_map : Type :=
   | empty  : partial_map
   | record : id -> nat -> partial_map -> partial_map.
@@ -459,7 +554,7 @@ Inductive partial_map : Type :=
 
 Definition update (d: partial_map)(key: id)(value: nat): partial_map :=
   record key value d.
- 
+
 Fixpoint find (key: id)(d: partial_map): natoption :=
   match d with
   | empty         => None
@@ -484,7 +579,7 @@ Proof.
     rewrite <- beq_nat_refl.
     reflexivity.
 Qed.
- 
+
 
 (** **** Exercise: 1 star (update_neq)  *)
 Theorem update_neq: forall (d: partial_map)(m n: id)(o: nat),
@@ -499,7 +594,6 @@ Proof.
     apply H.
   }
   apply Q in P.
-    
   destruct d.
   - simpl.
     rewrite P.
@@ -508,8 +602,8 @@ Proof.
     rewrite P.
     reflexivity.
 Qed.
-      
-    
+
+
 
 End PartialMap.
 
