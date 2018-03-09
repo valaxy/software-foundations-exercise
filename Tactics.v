@@ -121,13 +121,22 @@ Abort.
 Theorem combine_split: forall X Y (l: list (X * Y)) l1 l2,
   split l = (l1, l2) -> combine l1 l2 = l.
 Proof.
-  intros X Y l l1 l2 H.
-  induction l.
-  - unfold split in H.
-    inversion H.
+  induction l as [|(x, y) l'].
+  + intros l1 l2 h1.
+    simpl in h1.
+    inversion h1.
     reflexivity.
-  - simpl in H.
-Abort.
+  + simpl.
+    destruct (split l') as [xs ys]. 
+    intros l1 l2 h1.
+    inversion h1.
+    simpl.
+    rewrite IHl'.
+    - reflexivity.
+    - reflexivity.
+Qed.
+
+
 
 
 (** **** Exercise: 2 stars (destruct_eqn_practice)  *)

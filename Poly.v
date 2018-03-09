@@ -1,6 +1,7 @@
-(** finish reading, not finish exercise **)
+(** finish reading, finish exercise **)
 Require Import List Bool Nat.
 Import ListNotations.
+
 Local Open Scope list_scope.
 
 (** **** Exercise: 2 stars (mumble_grumble)  *)
@@ -53,7 +54,7 @@ Definition fold_length {X: Type} (l: list X): nat :=
 
 
 
-  
+
 
 (** **** Exercise: 2 stars, optional (poly_exercises)  *)
 
@@ -102,8 +103,8 @@ Proof.
   - simpl.
     rewrite IHl1.
     rewrite app_assoc.
-    reflexivity.   
-Qed. 
+    reflexivity.
+Qed.
 
 
 Theorem rev_involutive: forall X: Type, forall l: list X,
@@ -115,8 +116,8 @@ Proof.
     rewrite rev_app_distr.
     rewrite IHl.
     reflexivity.
-Qed.    
-  
+Qed.
+
 
 
 
@@ -130,12 +131,13 @@ Fixpoint split {X Y: Type}(l: list (X*Y)): (list X) * (list Y) :=
   | nil => (nil, nil)
   | (x,y) :: t => let (l,r) := split t in (x :: l, y :: r)
   end.
-  
+
+
 Example test_split: split [(1,false);(2,false)] = ([1;2],[false;false]).
 Proof. reflexivity. Qed.
 
 
- 
+
 (** **** Exercise: 1 star, optional (hd_error_poly)  *)
 Definition hd_error {X: Type}(l: list X): option X :=
   match l with
@@ -201,7 +203,7 @@ Fixpoint flat_map {X Y: Type}(f: X -> list Y)(l: list X): (list Y) :=
 Example test_flat_map1: flat_map (fun n => [n;n;n]) [1;5;4] = [1; 1; 1; 5; 5; 5; 4; 4; 4].
 Proof. reflexivity.  Qed.
 
-   
+
 
 (** **** Exercise: 2 stars, optional (implicit_args)  *)
 (* not do it *)
@@ -210,6 +212,11 @@ Proof. reflexivity.  Qed.
 (** **** Exercise: 1 star, advanced (fold_types_different) *)
 (* sum with nat to Z *)
 
+
+
+
+
+(** * Additional Exercises *)
 
 (** **** Exercise: 2 stars (fold_length)  *)
 Theorem fold_length_correct: forall X (l: list X), fold_length l = length l.
@@ -228,10 +235,135 @@ Proof.
     simpl.
     rewrite IHl.
     reflexivity.
-Qed.    
+Qed.
 
 
-(* More exercises *)
 
+(** **** Exercise: 3 starsM (fold_map)  *)
+Definition fold_map {X Y: Type}(f: X -> Y)(l: list X): list Y :=
+  fold (fun x new_l => f x :: new_l ) l nil.
+
+
+Theorem fold_map_correct: forall X Y f l, @fold_map X Y f l = map f l.
+Proof.
+  intros.
+  induction l.
+  - reflexivity.
+  - simpl.
+    rewrite <- IHl.
+    unfold fold_map.
+    simpl.
+    reflexivity.
+Qed.
+
+
+
+(** **** Exercise: 2 stars, advanced (currying)  *)
+Definition prod_curry {X Y Z: Type}
+  (f: X * Y -> Z)(x: X)(y: Y): Z := f (x, y).
+
+Definition prod_uncurry {X Y Z: Type}(f: X -> Y -> Z)(p: X * Y): Z :=
+  f (fst p) (snd p).
+
+
+Theorem uncurry_curry: forall (X Y Z: Type)(f: X -> Y -> Z) x y,
+  prod_curry (prod_uncurry f) x y = f x y.
+Proof.
+  unfold prod_curry.
+  unfold prod_uncurry.
+  reflexivity.
+Qed.
+
+
+Theorem curry_uncurry: forall (X Y Z: Type)(f: (X * Y) -> Z)(p: X * Y),
+  prod_uncurry (prod_curry f) p = f p.
+Proof.
+  unfold prod_curry.
+  unfold prod_uncurry.
+  destruct p.
+  reflexivity.
+Qed.
+
+
+
+(** **** Exercise: 2 stars, advancedM (nth_error_informal)  *)
+(** not do it *)
+
+
+
+(** **** Exercise: 4 stars, advanced (church_numerals)  *)
+Module Church.
+Definition nat := forall X: Type, (X -> X) -> X -> X.
+
+Definition one: nat :=
+  fun (X: Type)(f: X -> X)(x: X) => f x.
+
+Definition two: nat :=
+  fun (X: Type)(f: X -> X)(x: X) => f (f x).
+
+Definition zero: nat :=
+  fun (X: Type)(f: X -> X)(x: X) => x.
+
+Definition three: nat :=
+  fun (X: Type)(f: X -> X)(x: X) => f (f (f x)).
+
+(** Successor of a natural number: *)
+Definition succ (n: nat): nat := fun (X: Type)(f: X -> X)(x: X) => f (n X f x).
+
+Example succ_1: succ zero = one.
+Proof. reflexivity. Qed.
+
+Example succ_2: succ one = two.
+Proof. reflexivity. Qed.
+
+Example succ_3: succ two = three.
+Proof. reflexivity. Qed.
+
+
+(** Addition of two natural numbers: *)
+Definition plus (n m: nat): nat :=
+  fun (X: Type)(f: X -> X)(x: X) => n X f (m X f x).
+
+
+Example plus_1: plus zero one = one.
+Proof. reflexivity. Qed.
+
+Example plus_2: plus two three = plus three two.
+Proof. reflexivity. Qed.
+
+Example plus_3:
+  plus (plus two two) three = plus one (plus three three).
+Proof. reflexivity. Qed.
+
+
+(** Multiplication: *)
+
+Definition mult (n m: nat): nat :=
+  fun (X: Type)(f: X -> X)(x: X) => m X (n X f) x.
+
+Example mult_1: mult one one = one.
+Proof. reflexivity. Qed.
+
+Example mult_2: mult zero (plus three three) = zero.
+Proof. reflexivity. Qed.
+
+Example mult_3: mult two three = plus three three.
+Proof. reflexivity. Qed.
+
+(** Exponentiation: *)
+(* TODO某种化简操作 *)
+Definition exp (n m: nat): nat := fun (X : Type) => m (X -> X) (n X).
+  (* m nat (mult n) one *)
+
+Example exp_1: exp two two = plus two two.
+Proof. reflexivity. Qed.
+
+Example exp_2: exp three two = plus (mult two (mult two two)) one.
+Proof. reflexivity. Qed.
+
+Example exp_3: exp three zero = one.
+Proof. reflexivity. Qed.
+
+End Church.
 
 
