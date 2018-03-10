@@ -1,23 +1,19 @@
+(**************************************
+  not Finish reading, not Finish exercise
+**************************************)
+
 Require Import Coq.Init.Nat.
 Require Import Coq.Lists.List.
 
 
- 
+
+
+(* ================================================================= *)
+(** * The apply Tactic *)
+
 (* This is proved in chapter Lists. *)
 Theorem rev_involutive: forall l: list nat, rev (rev l) = l.
-Proof. Admitted.    
-
-
-Definition minustwo (n: nat): nat :=
-  match n with
-    | O => O
-    | S O => O
-    | S (S n') => n'
-  end.
-
-
-
-
+Proof. Admitted.
 
 
 (** **** Exercise: 2 stars, optional (silly_ex)  *)
@@ -28,7 +24,7 @@ Theorem silly_ex:
 Proof.
   intros H.
   apply H.
-Qed.  
+Qed.
 
 (** **** Exercise: 3 stars (apply_exercise1)  *)
 Theorem rev_exercise1: forall (l l': list nat),
@@ -37,19 +33,38 @@ Proof.
   intros l l' H.
   rewrite H.
   symmetry.
-  apply rev_involutive.  
+  apply rev_involutive.
 Qed.
-  
+
 
 
 (** **** Exercise: 1 star, optional (apply_rewrite)  *)
 
 (**
-   apply: change goal by forall rule.
+   apply: change goal by forall rule or non-forall rule.
    rewrite: change goal by non-forall rule.
  **)
 
 
+
+
+
+(* ================================================================= *)
+(** * The apply ... with ... Tactic *)
+
+Theorem trans_eq : forall (X:Type) (n m o : X),
+  n = m -> m = o -> n = o.
+Proof.
+  intros X n m o eq1 eq2. rewrite -> eq1. rewrite -> eq2.
+  reflexivity.  Qed.
+
+
+Definition minustwo (n: nat): nat :=
+  match n with
+    | O => O
+    | S O => O
+    | S (S n') => n'
+  end.
 
 (** **** Exercise: 3 stars, optional (apply_with_exercise)  *)
 Example trans_eq_exercise: forall (n m o p: nat),
@@ -61,9 +76,14 @@ Proof.
   rewrite <- P.
   rewrite -> Q.
   reflexivity.
-Qed.
+Qed. (* do not know how to use apply with *)
 
 
+
+
+
+(* ================================================================= *)
+(** * The inversion Tactic *)
 
 (** **** Exercise: 1 star (inversion_ex3)  *)
 Example inversion_ex3: forall (X: Type) (x y z: X) (l j: list X),
@@ -90,12 +110,18 @@ Proof.
 Qed.
 
 
+
+
+
+(* ================================================================= *)
+(** * Using Tactics on Hypotheses *)
+
 (** **** Exercise: 3 stars, recommended (plus_n_n_injective)  *)
 Theorem plus_n_n_injective: forall n m, n + n = m + m -> n = m.
 Proof.
-  intros n m P. 
+  intros n m P.
   induction n.
-  - simpl in P. 
+  - simpl in P.
     destruct m.
     + reflexivity.
     + inversion P.
@@ -108,14 +134,20 @@ Proof.
       rewrite <- plus_n_Sm in H0.
       inversion H0.
       rewrite -> H1 in IHn.
-Abort.
+Abort. (* TODO *)
 
 
 
-(* Some Exercises *)
+(* ================================================================= *)
+(** * Varying the Induction Hypothesis *)
 
 
 
+
+
+
+(* ================================================================= *)
+(** * Using destruct on Compound Expressions *)
 
 (** **** Exercise: 3 stars, optional (combine_split)  *)
 Theorem combine_split: forall X Y (l: list (X * Y)) l1 l2,
@@ -127,7 +159,7 @@ Proof.
     inversion h1.
     reflexivity.
   + simpl.
-    destruct (split l') as [xs ys]. 
+    destruct (split l') as [xs ys].
     intros l1 l2 h1.
     inversion h1.
     simpl.
@@ -168,8 +200,5 @@ Proof.
       * rewrite H1.
         rewrite H1.
         reflexivity.
-Qed.             
-
-  
-  
+Qed.
 
