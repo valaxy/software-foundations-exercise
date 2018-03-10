@@ -1,8 +1,14 @@
-(** finish reading, finish exercise **)
+(**************************************
+  Finish reading, Finish exercise
+**************************************)
+
 Require Import List Bool Nat.
 Import ListNotations.
-
 Local Open Scope list_scope.
+
+
+
+
 
 (** **** Exercise: 2 stars (mumble_grumble)  *)
 Module MumbleGrumble.
@@ -25,7 +31,7 @@ Check (e mumble (b c 0)).
 (* Check (e bool (b c 0)). *)
 Check c.
 
-(*  
+(*
  - × [d (b a 5)]
  - √ [d mumble (b a 5)]
  - √ [d bool (b a 5)]
@@ -37,22 +43,6 @@ Check c.
 
 
 End MumbleGrumble.
-
-
-
-
-
-
-Fixpoint fold {X Y:Type}(f: X->Y->Y)(l: list X)(b: Y): Y :=
-  match l with
-  | nil => b
-  | h :: t => f h (fold f t b)
-  end.
-
-Definition fold_length {X: Type} (l: list X): nat :=
-  fold (fun _ n => S n) l 0.
-
-
 
 
 
@@ -153,6 +143,11 @@ Proof. reflexivity. Qed.
 
 
 
+
+(* ================================================================= *)
+(** * Functions as Data *)
+
+
 (** **** Exercise: 2 stars (filter_even_gt7)  *)
 Definition filter_even_gt7 (l: list nat): list nat :=
   filter (fun x => andb (7 <? x) (even x)) l.
@@ -168,7 +163,7 @@ Proof. reflexivity. Qed.
 
 (** **** Exercise: 3 stars (partition)  *)
 Definition partition {X: Type}(test: X -> bool)(l: list X): list X * list X :=
-  (filter test l, filter (fun x => negb (test x)) l).  
+  (filter test l, filter (fun x => negb (test x)) l).
 
 Example test_partition1: partition odd [1;2;3;4;5] = ([1;3;5], [2;4]).
 Proof. reflexivity. Qed.
@@ -216,7 +211,18 @@ Proof. reflexivity.  Qed.
 
 
 
+(* ================================================================= *)
 (** * Additional Exercises *)
+
+Fixpoint fold {X Y:Type}(f: X->Y->Y)(l: list X)(b: Y): Y :=
+  match l with
+  | nil => b
+  | h :: t => f h (fold f t b)
+  end.
+
+Definition fold_length {X: Type} (l: list X): nat :=
+  fold (fun _ n => S n) l 0.
+
 
 (** **** Exercise: 2 stars (fold_length)  *)
 Theorem fold_length_correct: forall X (l: list X), fold_length l = length l.
@@ -351,9 +357,8 @@ Example mult_3: mult two three = plus three three.
 Proof. reflexivity. Qed.
 
 (** Exponentiation: *)
-(* TODO某种化简操作 *)
+
 Definition exp (n m: nat): nat := fun (X : Type) => m (X -> X) (n X).
-  (* m nat (mult n) one *)
 
 Example exp_1: exp two two = plus two two.
 Proof. reflexivity. Qed.
@@ -365,5 +370,4 @@ Example exp_3: exp three zero = one.
 Proof. reflexivity. Qed.
 
 End Church.
-
 
